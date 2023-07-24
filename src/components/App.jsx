@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Modal from './Modal';
 import { Loader } from './Loader';
 import { Searchbar } from './Searchbar';
-// import { ImageGallery } from './ImageGallery';
+import ImageGallery from './ImageGallery';
 
 import './styles.css';
 
@@ -12,41 +12,47 @@ export class App extends Component {
   state = {
     showModal: false,
     inputValue: '',
-    carts: null,
+    cards: null,
     error: null,
     status: 'idle',
   };
   componentDidUpdate(prevProps, prevState) {
     const API_KEY = '37154434-e108fb93a0dd643270de780f1';
-    const perPage = 40;
+    const perPage = 12;
     const currentPage = 1;
 
-    if (prevProps.inputValue !== this.props.inputValue) {
+    if (prevState.inputValue !== this.state.inputValue) {
       this.setState({ status: 'pending' });
+
       const searchParams = new URLSearchParams({
         key: API_KEY,
-        q: this.props.inputValue,
+        q: this.state.inputValue,
+        page: currentPage,
         image_type: 'photo',
         orientation: 'horizontal',
         safesearch: true,
         per_page: perPage,
-        page: currentPage,
       });
+
       fetch(`https://pixabay.com/api/?${searchParams}`)
         .then(response => {
           if (response.ok) {
             return response.json();
           }
           return Promise.reject(
-            new Error(`Not found ${this.props.inputValue}`)
+            new Error(`Not found ${this.state.inputValue}`)
           );
         })
-        .then(({ hits }) => {
-          this.setState({ carts: hits, status: 'resolved' });
-          console.log(this.state.carts);
+        .then(data => {
+          this.setState({ cards: data.hits, status: 'resolved' });
+          console.log(data.hits);
+          console.log(prevState.cards);
+          console.log(this.state.cards);
+          console.log(prevState.status);
+          console.log(this.state.status);
         })
         .catch(error => {
-          this.setState({ error, status: 'resolved' });
+          this.setState({ error, status: 'rejected' });
           console.error(error);
         });
     }
@@ -54,7 +60,6 @@ export class App extends Component {
   handleFormSubmit = inputValue => {
     this.setState({ inputValue: inputValue });
     console.log(inputValue);
-    console.log(this.state.carts);
   };
   toggleModal = () => {
     this.setState(({ showModal }) => ({
@@ -62,7 +67,7 @@ export class App extends Component {
     }));
   };
   render() {
-    const { status, error, carts } = this.state;
+    const { status, error, cards } = this.state;
     if (status === 'idle') {
       return (
         <div className="App">
@@ -93,7 +98,7 @@ export class App extends Component {
       return (
         <div className="App">
           <Searchbar inputSubmit={this.handleFormSubmit} />
-          {/* <ImageGallery /> */}
+          <ImageGallery cards={cards} />
         </div>
       );
     }
