@@ -1,10 +1,20 @@
 import { Component } from 'react';
+import { ToastContainer } from 'react-toastify';
 import Modal from './Modal';
 import { Loader } from './Loader';
+import { Searchbar } from './Searchbar';
+import { ImageGallery } from './ImageGallery';
+
+import './styles.css';
 
 export class App extends Component {
   state = {
     showModal: true,
+    inputValue: '',
+  };
+  handleFormSubmit = inputValue => {
+    this.setState({ inputValue: inputValue });
+    console.log(inputValue);
   };
   toggleModal = () => {
     this.setState(({ showModal }) => ({
@@ -13,17 +23,9 @@ export class App extends Component {
   };
   render() {
     return (
-      <div
-        style={{
-          height: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: 40,
-          color: '#010101',
-        }}
-      >
-        React homework template
+      <div className="App">
+        <Searchbar inputSubmit={this.handleFormSubmit} />
+        <ImageGallery inputValue={this.state.inputValue} />
         {this.state.showModal && (
           <Modal onClose={this.toggleModal}>
             <p>
@@ -35,6 +37,7 @@ export class App extends Component {
             <Loader />
           </Modal>
         )}
+        <ToastContainer autoClose={3000} />
       </div>
     );
   }

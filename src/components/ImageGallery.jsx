@@ -1,14 +1,24 @@
+import { Component } from 'react';
 import './styles.css';
-export const ImageGallery = () => {
-  <ul class="gallery">
-    {Array.map(({ title, webformatURL, id }) => (
-      <li className="ImageGalleryItem" key={id}>
-        <img
-          src={webformatURL}
-          alt={title}
-          className="ImageGalleryItem-image"
-        />
-      </li>
-    ))}
-  </ul>;
-};
+export default class ImageGallery extends Component {
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.inputValue !== this.props.inputValue) {
+    }
+  }
+  render() {
+    return (
+      <ul class="gallery">
+        {cards.map(({ tags, webformatURL, id }) => (
+          <li className="ImageGalleryItem" key={id}>
+            <img
+              src={webformatURL}
+              alt={tags}
+              loading="lazy"
+              className="ImageGalleryItem-image"
+            />
+          </li>
+        ))}
+      </ul>
+    );
+  }
+}
