@@ -5,6 +5,7 @@ import Modal from './Modal';
 import { Loader } from './Loader';
 import { Searchbar } from './Searchbar';
 import ImageGallery from './ImageGallery';
+import { ImageGalleryItem } from './ImageGalleryItem';
 
 import './styles.css';
 
@@ -15,6 +16,7 @@ export class App extends Component {
     cards: null,
     error: null,
     status: 'idle',
+    card: null,
   };
   componentDidUpdate(prevProps, prevState) {
     const API_KEY = '37154434-e108fb93a0dd643270de780f1';
@@ -44,12 +46,12 @@ export class App extends Component {
           );
         })
         .then(data => {
+          if (data === null) {
+            return Promise.reject(
+              new Error(`Not found ${this.state.inputValue}`)
+            );
+          }
           this.setState({ cards: data.hits, status: 'resolved' });
-          console.log(data.hits);
-          console.log(prevState.cards);
-          console.log(this.state.cards);
-          console.log(prevState.status);
-          console.log(this.state.status);
         })
         .catch(error => {
           this.setState({ error, status: 'rejected' });
@@ -66,8 +68,16 @@ export class App extends Component {
       showModal: !showModal,
     }));
   };
+
+  // handleChoseFoto = id => {
+  //   this.toggleModal();
+  //   this.setState(prevState => ({
+  //     card: prevState.cards.filter(card => card.id === id),
+  //   }));
+  // };
+
   render() {
-    const { status, error, cards } = this.state;
+    const { status, error, cards, showModal } = this.state;
     if (status === 'idle') {
       return (
         <div className="App">
@@ -87,10 +97,10 @@ export class App extends Component {
     }
     if (status === 'rejected') {
       toast.error(error.message);
-      <ToastContainer autoClose={3000} />;
       return (
         <div className="App">
           <Searchbar inputSubmit={this.handleFormSubmit} />
+          <ToastContainer autoClose={3000} />;
         </div>
       );
     }
@@ -98,7 +108,12 @@ export class App extends Component {
       return (
         <div className="App">
           <Searchbar inputSubmit={this.handleFormSubmit} />
-          <ImageGallery cards={cards} />
+          <ImageGallery cards={cards} toggleModal={this.toggleModal} />
+          {showModal && (
+            <Modal onClose={this.toggleModal}>
+              <ImageGalleryItem card={this.card} />
+            </Modal>
+          )}
         </div>
       );
     }
