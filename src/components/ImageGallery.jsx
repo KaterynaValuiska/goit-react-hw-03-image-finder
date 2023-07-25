@@ -1,9 +1,13 @@
 import { Component } from 'react';
 import './styles.css';
 export default class ImageGallery extends Component {
-  handleChoseFoto = evt => {
-    console.log(evt.target.id);
+  state = {
+    cardId: null,
+  };
+  handleChoseFotoId = evt => {
+    this.setState({ cardId: evt.target.id });
     this.props.toggleModal();
+    this.props.handleChoseFoto(this.state.cardId);
   };
   render() {
     return (
@@ -13,7 +17,7 @@ export default class ImageGallery extends Component {
             <li
               className="ImageGalleryItem"
               key={id}
-              onClick={this.handleChoseFoto}
+              onClick={this.handleChoseFotoId}
             >
               <img
                 src={webformatURL}

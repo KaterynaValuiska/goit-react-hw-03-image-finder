@@ -6,6 +6,7 @@ import { Loader } from './Loader';
 import { Searchbar } from './Searchbar';
 import ImageGallery from './ImageGallery';
 import { ImageGalleryItem } from './ImageGalleryItem';
+import { Button } from './Button';
 
 import './styles.css';
 
@@ -17,11 +18,12 @@ export class App extends Component {
     error: null,
     status: 'idle',
     card: null,
+    cardId: null,
+    currentPage: 1,
   };
   componentDidUpdate(prevProps, prevState) {
     const API_KEY = '37154434-e108fb93a0dd643270de780f1';
     const perPage = 12;
-    const currentPage = 1;
 
     if (prevState.inputValue !== this.state.inputValue) {
       this.setState({ status: 'pending' });
@@ -29,7 +31,7 @@ export class App extends Component {
       const searchParams = new URLSearchParams({
         key: API_KEY,
         q: this.state.inputValue,
-        page: currentPage,
+        page: this.nextPage(),
         image_type: 'photo',
         orientation: 'horizontal',
         safesearch: true,
@@ -69,13 +71,15 @@ export class App extends Component {
     }));
   };
 
-  // handleChoseFoto = id => {
-  //   this.toggleModal();
-  //   this.setState(prevState => ({
-  //     card: prevState.cards.filter(card => card.id === id),
-  //   }));
-  // };
-
+  handleChoseFoto = cardId => {
+    this.setState({ cardId });
+    this.setState({ card: this.state.cards.find(card => card.id === cardId) });
+    console.log(this.state.cards);
+    console.log(this.state.card);
+  };
+  nextPage = currentPage => {
+    return this.setState({ currentPage: currentPage });
+  };
   render() {
     const { status, error, cards, showModal } = this.state;
     if (status === 'idle') {
@@ -108,7 +112,12 @@ export class App extends Component {
       return (
         <div className="App">
           <Searchbar inputSubmit={this.handleFormSubmit} />
-          <ImageGallery cards={cards} toggleModal={this.toggleModal} />
+          <ImageGallery
+            cards={cards}
+            toggleModal={this.toggleModal}
+            handleChoseFoto={this.handleChoseFoto}
+          />
+          <Button currentPage={this.nextPage} />
           {showModal && (
             <Modal onClose={this.toggleModal}>
               <ImageGalleryItem card={this.card} />
