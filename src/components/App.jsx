@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Scrollbar } from 'smooth-scrollbar-react';
 import Modal from './Modal';
 import { Loader } from './Loader';
 import { Searchbar } from './Searchbar';
@@ -24,8 +25,6 @@ export class App extends Component {
   componentDidUpdate(prevProps, prevState) {
     const API_KEY = '37154434-e108fb93a0dd643270de780f1';
     const perPage = 12;
-
-    console.log(this.state.currentPage);
 
     if (
       prevState.inputValue !== this.state.inputValue ||
@@ -53,14 +52,14 @@ export class App extends Component {
           );
         })
         .then(data => {
-          if (data === null) {
+          if (!data.total) {
             return Promise.reject(
               new Error(`Not found ${this.state.inputValue}`)
             );
           }
           this.setState(prevState => ({
-            cards: data.hits,
-            // cards: [... prevState.carts, data.hits],
+            // cards: data.hits,
+            cards: [...prevState.cards, ...data.hits],
             status: 'resolved',
             total: data.totalHits - this.state.currentPage * 12,
           }));
@@ -72,8 +71,11 @@ export class App extends Component {
     }
   }
   handleFormSubmit = inputValue => {
-    this.setState({ inputValue: inputValue });
-    console.log(inputValue);
+    if (this.state.inputValue === inputValue) {
+      toast(`${this.state.inputValue} already found`);
+      return;
+    }
+    this.setState({ inputValue: inputValue, currentPage: 1, cards: [] });
   };
   toggleModal = () => {
     this.setState(({ showModal }) => ({
@@ -90,6 +92,7 @@ export class App extends Component {
       currentPage: prevState.currentPage + 1,
     }));
   };
+
   render() {
     const { status, error, cards, showModal, total } = this.state;
 
@@ -107,6 +110,7 @@ export class App extends Component {
         <div className="App">
           <Searchbar inputSubmit={this.handleFormSubmit} />
           <Loader />
+          <ToastContainer autoClose={3000} />;
         </div>
       );
     }
@@ -123,17 +127,20 @@ export class App extends Component {
       return (
         <div className="App">
           <Searchbar inputSubmit={this.handleFormSubmit} />
-          <ImageGallery
-            cards={cards}
-            toggleModal={this.toggleModal}
-            onSelect={this.handleSelectFoto}
-          />
+          <Scrollbar>
+            <ImageGallery
+              cards={cards}
+              toggleModal={this.toggleModal}
+              onSelect={this.handleSelectFoto}
+            />
+          </Scrollbar>
           {total >= 0 && <Button handleChangePage={this.nextPage} />}
           {showModal && (
             <Modal onClose={this.toggleModal}>
-              <img src={this.state.card} alt="" />
+              <img src={this.state.card} alt="" width={600} />
             </Modal>
           )}
+          <ToastContainer autoClose={3000} />;
         </div>
       );
     }

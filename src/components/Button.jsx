@@ -5,6 +5,7 @@ export class Button extends Component {
     return (
       <button
         type="button"
+        id="loadMore"
         className="Button"
         onClick={this.props.handleChangePage}
       >

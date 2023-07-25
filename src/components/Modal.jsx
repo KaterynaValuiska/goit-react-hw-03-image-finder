@@ -22,6 +22,7 @@ export default class Modal extends Component {
       this.props.onClose();
     }
   };
+
   render() {
     return createPortal(
       <div className="Overlay" onClick={this.handleOverlay}>
