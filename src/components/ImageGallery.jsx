@@ -1,23 +1,15 @@
 import { Component } from 'react';
 import './styles.css';
 export default class ImageGallery extends Component {
-  state = {
-    cardId: null,
-  };
-  handleChoseFotoId = evt => {
-    this.setState({ cardId: evt.target.id });
-    this.props.toggleModal();
-    this.props.handleChoseFoto(this.state.cardId);
-  };
   render() {
     return (
       <>
         <ul className="ImageGallery">
-          {this.props.cards.map(({ tags, webformatURL, id }) => (
+          {this.props.cards.map(({ tags, webformatURL, id, largeImageURL }) => (
             <li
-              className="ImageGalleryItem"
               key={id}
-              onClick={this.handleChoseFotoId}
+              className="ImageGalleryItem"
+              onClick={() => this.props.onSelect(largeImageURL)}
             >
               <img
                 src={webformatURL}

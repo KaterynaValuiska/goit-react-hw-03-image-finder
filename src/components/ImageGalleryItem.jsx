@@ -1,6 +1,4 @@
 import './styles.css';
-export const ImageGalleryItem = ({ largeImageURL, tags, id }) => {
-  <li key={id} className="ImageGalleryItem">
-    <img src={largeImageURL} alt={tags} className="ImageGalleryItem-image" />
-  </li>;
+export const ImageGalleryItem = largeImageURL => {
+  <img src={largeImageURL} alt="" />;
 };

@@ -5,7 +5,7 @@ import Modal from './Modal';
 import { Loader } from './Loader';
 import { Searchbar } from './Searchbar';
 import ImageGallery from './ImageGallery';
-import { ImageGalleryItem } from './ImageGalleryItem';
+// import { ImageGalleryItem } from './ImageGalleryItem';
 import { Button } from './Button';
 
 import './styles.css';
@@ -14,24 +14,29 @@ export class App extends Component {
   state = {
     showModal: false,
     inputValue: '',
-    cards: null,
+    cards: [],
     error: null,
     status: 'idle',
-    card: null,
-    cardId: null,
+    card: '',
     currentPage: 1,
+    total: null,
   };
   componentDidUpdate(prevProps, prevState) {
     const API_KEY = '37154434-e108fb93a0dd643270de780f1';
     const perPage = 12;
 
-    if (prevState.inputValue !== this.state.inputValue) {
+    console.log(this.state.currentPage);
+
+    if (
+      prevState.inputValue !== this.state.inputValue ||
+      prevState.currentPage !== this.state.currentPage
+    ) {
       this.setState({ status: 'pending' });
 
       const searchParams = new URLSearchParams({
         key: API_KEY,
         q: this.state.inputValue,
-        page: this.nextPage(),
+        page: this.state.currentPage,
         image_type: 'photo',
         orientation: 'horizontal',
         safesearch: true,
@@ -53,7 +58,12 @@ export class App extends Component {
               new Error(`Not found ${this.state.inputValue}`)
             );
           }
-          this.setState({ cards: data.hits, status: 'resolved' });
+          this.setState(prevState => ({
+            cards: data.hits,
+            // cards: [... prevState.carts, data.hits],
+            status: 'resolved',
+            total: data.totalHits - this.state.currentPage * 12,
+          }));
         })
         .catch(error => {
           this.setState({ error, status: 'rejected' });
@@ -70,18 +80,19 @@ export class App extends Component {
       showModal: !showModal,
     }));
   };
-
-  handleChoseFoto = cardId => {
-    this.setState({ cardId });
-    this.setState({ card: this.state.cards.find(card => card.id === cardId) });
-    console.log(this.state.cards);
-    console.log(this.state.card);
+  handleSelectFoto = largeImageURL => {
+    this.toggleModal();
+    this.setState({ card: largeImageURL });
   };
-  nextPage = currentPage => {
-    return this.setState({ currentPage: currentPage });
+
+  nextPage = () => {
+    return this.setState(prevState => ({
+      currentPage: prevState.currentPage + 1,
+    }));
   };
   render() {
-    const { status, error, cards, showModal } = this.state;
+    const { status, error, cards, showModal, total } = this.state;
+
     if (status === 'idle') {
       return (
         <div className="App">
@@ -115,12 +126,12 @@ export class App extends Component {
           <ImageGallery
             cards={cards}
             toggleModal={this.toggleModal}
-            handleChoseFoto={this.handleChoseFoto}
+            onSelect={this.handleSelectFoto}
           />
-          <Button currentPage={this.nextPage} />
+          {total >= 0 && <Button handleChangePage={this.nextPage} />}
           {showModal && (
             <Modal onClose={this.toggleModal}>
-              <ImageGalleryItem card={this.card} />
+              <img src={this.state.card} alt="" />
             </Modal>
           )}
         </div>
@@ -128,24 +139,3 @@ export class App extends Component {
     }
   }
 }
-
-// return (
-//       <div className="App">
-//         <Searchbar inputSubmit={this.handleFormSubmit} />
-//         {this.state.loading && <Loader />}
-//         {this.state.error && }
-//         {/* <ImageGallery /> */}
-//         {this.state.showModal && (
-//           <Modal onClose={this.toggleModal}>
-//             <p>
-//               Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sint,
-//               distinctio magnam eaque atque recusandae maxime maiores
-//               consequuntur ratione tempora quos praesentium porro illum, qui
-//               aperiam blanditiis earum? Maiores, quisquam quia!
-//             </p>
-//             <Loader />
-//           </Modal>
-//         )}
-//         <ToastContainer autoClose={3000} />
-//       </div>
-//     );
