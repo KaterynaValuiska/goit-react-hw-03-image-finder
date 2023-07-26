@@ -39,4 +39,5 @@ export default class Modal extends Component {
 
 Modal.propTypes = {
   handleOverlay: PropTypes.func.isRequired,
+  children: PropTypes.element.isRequired,
 };

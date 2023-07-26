@@ -8,7 +8,7 @@ export class Button extends Component {
   render() {
     return (
       <div onClick={this.scrollToTop}>
-        <Link />
+        <Link to="loadMore" />
         <button
           type="button"
           id="loadMore"
