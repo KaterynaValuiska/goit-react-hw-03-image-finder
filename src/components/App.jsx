@@ -1,7 +1,6 @@
 import { Component } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Scrollbar } from 'smooth-scrollbar-react';
 import Modal from './Modal';
 import { Loader } from './Loader';
 import { Searchbar } from './Searchbar';
@@ -53,12 +52,12 @@ export class App extends Component {
         })
         .then(data => {
           if (!data.total) {
+            toast.error(`Not found ${this.state.inputValue}`);
             return Promise.reject(
               new Error(`Not found ${this.state.inputValue}`)
             );
           }
           this.setState(prevState => ({
-            // cards: data.hits,
             cards: [...prevState.cards, ...data.hits],
             status: 'resolved',
             total: data.totalHits - this.state.currentPage * 12,
@@ -66,6 +65,7 @@ export class App extends Component {
         })
         .catch(error => {
           this.setState({ error, status: 'rejected' });
+          alert(`Not found ${this.state.inputValue}`);
           console.error(error);
         });
     }
@@ -127,13 +127,11 @@ export class App extends Component {
       return (
         <div className="App">
           <Searchbar inputSubmit={this.handleFormSubmit} />
-          <Scrollbar>
-            <ImageGallery
-              cards={cards}
-              toggleModal={this.toggleModal}
-              onSelect={this.handleSelectFoto}
-            />
-          </Scrollbar>
+          <ImageGallery
+            cards={cards}
+            toggleModal={this.toggleModal}
+            onSelect={this.handleSelectFoto}
+          />
           {total >= 0 && <Button handleChangePage={this.nextPage} />}
           {showModal && (
             <Modal onClose={this.toggleModal}>
